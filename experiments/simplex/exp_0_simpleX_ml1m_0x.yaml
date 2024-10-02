@@ -1,0 +1,243 @@
+# Experiment XX
+#   dataset: MoveLeanse, ml-1m
+#   model: SimpleX
+#  distil loss: 
+
+
+###
+# General section
+###
+
+    logger_level: 'INFO' # 'WARNING'
+    journal_name: 'simplex_distils.csv'    
+
+###
+# Training settings section
+###
+
+    data_path: './datasets'  # Path to the dataset directory
+    dataset: 'ml-1m'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    #load_col:  {inter: [user_id, product_id]} # for steam dataset need to rename item_id column
+    #ITEM_ID_FIELD: product_id # for steam dataset need to rename item_id column
+    seed: 42
+    show_progress: False
+    save: True
+    reproducibility: True
+    epochs: 3  # Number of epochs to train
+    learning_rate: 0.01  # Learning rate
+    use_gpu: False  # Use GPU for training
+    eval_batch_size: 64
+    train_batch_size: 64
+    stopping_step: 50
+
+###
+# Dataset configuration section
+###
+
+    # USER_ID_FIELD: user_id
+    # ITEM_ID_FIELD: item_id
+    # RATING_FIELD: rating
+    # TIME_FIELD: timestamp
+
+    load_col:
+        inter: [user_id, item_id, rating, timestamp]
+#         user: [user_id, age]
+    user_inter_num_interval: "[450,500)"
+#    item_inter_num_interval: "[101,inf)"
+
+    
+    # min_user_inter_num: 5
+    # max_user_inter_num: 500
+    # val_interval:
+    #    rating: "[3,inf)"
+    #    rating: "[1,3)"
+    #    timestamp: "[97830000, inf)"
+
+    threshold:
+        rating: 3
+    # train_neg_sample_args: ~
+    # normalize_all: False
+
+
+
+    eval_args:
+        split:
+            RS: [0.7, 0.15, 0.15]
+        order: 'RO'
+        mode:
+            'valid': 'pop50'
+            'test': 'pop50'
+
+
+    add_train_shuffle: False
+    #    add_train_split: [0.5, 0.5]
+
+###
+# Model setup section
+###
+
+    model: 'SimpleX'      # Model to use; Examples: NeuMF, DSSM
+    embedding_size: 128   #   The embedding size of users and items. Defaults to 64.
+    margin: 0.9           #   The margin to filter negative samples in CCL loss. 
+                          #   Range in [-1, 1]. Defaults to 0.9.
+    negative_weight: 10   #   Control the relative weights of positive-sample loss 
+                          #      and negative-sample loss in CCL loss. Defaults to 10.
+    gamma: 0.5            #   The weight for fusion of user representations and 
+                          #      historically interacted items representations. 
+                          #   Range in [0, 1]. Defaults to 0.5.
+    aggregator: 'mean'    #   The way to aggregate historically interacted items representations.
+                          #   Range in ['mean', 'user_attention', 'self_attention']. Defaults to 'mean'.
+    history_len: 50       #   The length of the user’s historical interaction items. Defaults to 50.
+    reg_weight: 1e-5      #   The L2 regularization weight. Defaults to 1e-05.
+    
+    llm_config:
+        embeddings_path: './datasets/llm_embeddings'   
+        default_users_emb_file: 'user.pt'
+        default_items_emb_file: 'item.pt'
+        
+        preprocess_from_json:    
+            from: 'full_user_description.json'
+            to: 'user1536.pt'
+            by: 'exp_2024_04_11'
+
+        preprocess_random:        
+            random: False  # in case if we want generate random embeddings
+            embedding_size: 100 # size of embeddings for random embeddings
+            random_users_emb_file: 'user.pt'
+            random_items_emb_file: 'item.pt'
+          
+        use_user_emb: True # Do we need loading users emb 
+        use_item_emb: False # Do we need loading items emb
+        
+        users_start_with_1: True  # Add zero string at 0 position of embeddings matrix
+        items_start_with_1: True # Add zero string at 0 position of embeddings matrix
+
+        
+    distil_loss_weight: 0.5  # [0, 1]
+    
+###
+# Scenario Training setup
+###
+
+    scenario:
+        [
+        # Part 1 Destilation
+            {
+            'command': 'print',
+            'params': '-----Part #1: distilation'
+            },
+            {
+            'command': 'set',
+            'params': {'train_part': 0}
+            },
+            {
+            'command': 'init_model',
+            'params': None
+            },
+            {
+            'command': 'reduce_dim',
+            'params': {
+                'file_in': 'user1536.pt',  
+                'file_out': 'user64.pt', 
+                'dimension': 64, 
+                'overwrite': True
+                }
+            },
+            {
+            'command': 'wrap_model',
+            # Available params: users_emb_file, items_emb_file
+            'params': {
+                'distil_loss': 'SimpleXUserRMSE', 
+                'users_emb_file': 'user64.pt',
+                'particular': True 
+                }
+            },
+            {
+            'command': 'set_config',
+            'params': {'epochs': 2}
+            },            
+            {
+            'command': 'init_trainer',
+            'params': None
+            },
+            {
+            'command': 'info',
+            'params': 0
+            },
+            # {
+            # 'command': 'set_trainable',
+            # 'params': [[0, 1, 2, 3], False]  # list of layers should be changed on True/False
+            # },
+            {
+            'command': 'info',
+            'params': 0
+            },
+            {
+            'command': 'set_outputs',
+            'params': [5]
+            },
+            {
+            'command': 'set_train_dataset',
+            'params': 0 # 0 or 1, as far as there is only two options
+            },
+#             {
+#             'command': 'break'
+#             },            
+            {
+            'command': 'train',
+            'params': None
+            },
+            {
+            'command': 'test_eval',
+            'params': None
+            },
+         # Part 2 Learning
+            {
+            'command': 'print',
+            'params': '-----Part #2: fine-tune without distilation'
+            },
+            {
+            'command': 'set',
+            'params': {'train_part': 1}
+            },         
+            {
+            'command': 'remove_outputs',
+            'params': None
+            },
+            {
+            'command': 'set_config',
+            'params': {'epochs': 2}
+            },    
+            {
+            'command': 'init_trainer',
+            'params': None
+            },
+            {
+            'command': 'info',
+            'params': 0
+            },            
+            #            {
+            #'command': 'set_trainable',
+            #'params': [[0, 1, 2, 3], True]  # list of layers should be changed on True/False
+            #},
+            #{
+            #'command': 'set_trainable',
+            #'params': [[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], False]  # list of layers should be changed on True/False
+            #},    
+            {
+            'command': 'info',
+            'params': 0
+            },                        
+            {
+            'command': 'set_train_dataset',
+            'params': 0 # 0 or 1, as far as there is only two options
+            },
+            {
+            'command': 'train',
+            'params': None
+            },
+            {
+            'command': 'test_eval',
+            'params': None
+            }            
+        ]

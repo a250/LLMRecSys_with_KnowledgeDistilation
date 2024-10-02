@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "llm4recsys"
+version = "0.1.0"
+description = ""
+authors = ["Alexey Zy <zaaalexey@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.0"
+torch = "^2.2.0"
+ipywidgets = "^8.1.2"
+transformers = "^4.37.2"
+torchsummary = "^1.5.1"
+setuptools = "^69.1.1"
+recbole = "^1.2.0"
+torchviz = "^0.0.2"
+kmeans-pytorch = "^0.3"
+matplotlib = "^3.8.4"
+umap-learn = "^0.5.6"
+lightgbm = "^4.5.0"
+xgboost = "^2.1.1"
+scipy = "1.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
