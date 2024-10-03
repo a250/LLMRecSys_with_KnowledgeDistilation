@@ -5,32 +5,53 @@ Set of tools above RecBole framework to experimenting with distillation of knowl
 
 Structure of folders could particularly tune by config-file, but the typical project structures like this:
 ```
- /datasets
-    /dataset_1_name
-    /dataset_2_name
-    ...
-    /llm_embeddings
-        /dataset_1_name
-            - some_file_with_profile_embedding.json
-            - some_profile_matrix_32.pt
-            - ...
-        /dataset_2_name
-/experiments
-    /models_1_configs
-        /some_models_1_batch_1_of_exps
-            - some_exp_1.yaml
-            - some_exp_2.yaml
-            - ...
-            - some_reports_of_result.csv
-        /some_models_2_batch_2_of_exps
-            - ...
-/models
-    - lossess.py          # implementation of distil losses
-    - implementation_of_different_external_models.py
-/utils                    # all modules is here
 
-- run_exps.py             # main enter poit for running
-- poetry.lock             # required dependencies
+.
+├── LICENSE
+├── README.md
+├── datasets 
+│   ├── llm_embeddings
+│   │   └── ml-1m # profile embeddings for datasets
+│   └── ml-1m  # secific datasets
+│       ├── README.md
+│       ├── ml-1m.inter
+│       ├── ml-1m.item
+│       └── ml-1m.user
+├── experiments
+│   ├── autoint
+│   │   ├── ...
+│   │   └── ...
+│   ├── neumf
+│   │   ├── ...some folder with bandles of experiments
+│   │   ├── 01_exp_bandle_...
+│   │   ├── 02_exp_bandle_...
+│   │   ├── 03_exp_bandle_kar_ml1m
+│   │   ├── 04_exp_bandle_kar_ml1m
+│   │   ├── 05_exp_bandle_kar_avc
+│   │   ├── ... or some separated experiment (.yaml)
+│   │   ├── exp_1_NeuMF_ml1m_..._.yaml
+│   │   ├── exp_2_NeuMF_ACV_..._.yaml
+│   │   └── exp_3_NeuMF_ml1m_..._.yaml
+├── log
+│   └── NeuMF
+│       ├── ... 
+│       └── ...
+├── models
+│   ├── losses.py     # implementation of distil losses
+│   ├── ...external custom models:
+│   ├── ..._.py
+│   └── twotowers.py
+├── saved
+│   ├── .... saved best resulted models: 
+│   └── NeuMF-Oct-02-2024_22-12-30.pth
+├── utils            # all modules is here
+│   ├── journal.py
+│   ├── tmanager.py
+│   ├── utils.py
+│   └── wrapper.py
+├── poetry.lock      # required dependencies
+├── pyproject.toml   # required dependencies
+└── run_exps.py      # main enter poit for running
 ```
 
 The way of running specific experiment or the bunch of experiments which collected in folder:
@@ -46,7 +67,7 @@ Configuration and scenario of experiments is setting up by  `.yaml` configuratio
 # config.yaml
 
 ###
-# Part 1. Setup typical RecBal parameters
+# Part 1. Setup typical RecBole parameters
 ###
 
     # RecBole Model setup
@@ -83,7 +104,7 @@ This config section can address this main issues:
  - transforming profiles embeddings from given `.json` profiles to `.pt` matrix, or
  - produce random `.pt` matrix for debuging purpose
 
-### Scenario setup sections
+### Scenario setup 
 Can execute following commands:
 - `print`
 - `set`
