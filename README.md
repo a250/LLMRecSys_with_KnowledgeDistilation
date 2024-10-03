@@ -7,8 +7,6 @@ Structure of folders could particularly tune by config-file, but the typical pro
 ```
 
 .
-├── LICENSE
-├── README.md
 ├── datasets 
 │   ├── llm_embeddings
 │   │   └── ml-1m # profile embeddings for datasets
@@ -49,6 +47,8 @@ Structure of folders could particularly tune by config-file, but the typical pro
 │   ├── tmanager.py
 │   ├── utils.py
 │   └── wrapper.py
+├── LICENSE
+├── README.md
 ├── poetry.lock      # required dependencies
 ├── pyproject.toml   # required dependencies
 └── run_exps.py      # main enter poit for running
@@ -56,7 +56,7 @@ Structure of folders could particularly tune by config-file, but the typical pro
 
 The way of running specific experiment or the bunch of experiments which collected in folder:
 ```
-python run_exps.py ./experiments/path_to_exps/experiment_folder_or_yaml [--start_with=n]
+> python run_exps.py ./experiments/path_to_exps/experiment_folder_or_yaml [--start_with=n]
 ```
 
 
@@ -94,7 +94,6 @@ Configuration and scenario of experiments is setting up by  `.yaml` configuratio
 
         ...
     ]
-
 
 
 ```
@@ -137,6 +136,7 @@ dropout_prob: 0.1
 ### Preliminary steps of scenario
 
 ```
+...
 scenario:
     [
     # Part 1 Destilation
@@ -241,7 +241,7 @@ In order to to access for all inputs and outputs passing through specific layer 
     ...
     {
         'command': 'set_outputs',
-        'params': [9]
+        'params': [9]  # could be an list of layers
     },
     ...
 ```
