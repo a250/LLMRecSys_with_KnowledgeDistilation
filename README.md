@@ -131,6 +131,7 @@ mf_embedding_size: 64  # Some settings according to RecBole
 mlp_embedding_size: 512
 mlp_hidden_size: [256, 128, 64]
 dropout_prob: 0.1
+...
 ```
 
 ### Preliminary steps of scenario

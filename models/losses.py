@@ -152,6 +152,7 @@ class NeumfUserRMSE(DistilLosses):
         
         return loss
     
+    
 class AutoIntUserRMSE(DistilLosses): 
     def __init__(
         self, 
@@ -159,7 +160,7 @@ class AutoIntUserRMSE(DistilLosses):
         llm_users_emf_file: str = None, 
         llm_items_emf_file: str = None
     ):
-        super(AutoIntUserCosSim, self).__init__(model, llm_users_emf_file, llm_items_emf_file)
+        super(AutoIntUserRMSE, self).__init__(model, llm_users_emf_file, llm_items_emf_file)
         
         
     def __call__(self, hidden_out, interaction):
