@@ -158,6 +158,22 @@
             'params': 1
             },
             {
+            'command': 'info',
+            'params': 0
+            },            
+            {
+            'command': 'set_trainable',
+            'params': [['*'], False]  # Freeze all layers
+            },
+            {
+            'command': 'set_trainable',
+            'params': [[2, 3, 4, 5], True]  # Make tranable specific layers
+            },     
+            {
+            'command': 'info',
+            'params': 0
+            },                     
+            {
             'command': 'break'
             },               
             # {

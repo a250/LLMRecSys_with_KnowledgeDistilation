@@ -143,50 +143,50 @@ scenario:
     # Part 1 Destilation
 
         {
-            # Output information to console
-            'command': 'print',
-            'params': '-----Part #1: distilation'
+        # Output information to console
+        'command': 'print',
+        'params': '-----Part #1: distilation'
         },
         {
-            # set the variable which use in output report
-            'command': 'set',
-            'params': {'train_part': 0}
+        # set the variable which use in output report
+        'command': 'set',
+        'params': {'train_part': 0}
         },
         {
-            # init model base on RecBole logic
-            'command': 'init_model',
-            'params': None
+        # init model base on RecBole logic
+        'command': 'init_model',
+        'params': None
         },
         {
-            # dimentionality reduction
-            'command': 'reduce_dim',
-            'params': {
-                'file_in': 'user1536.pt',  
-                'file_out': 'user64.pt', 
-                'dimension': 64, 
-                'overwrite': True
-                }
+        # dimentionality reduction
+        'command': 'reduce_dim',
+        'params': {
+            'file_in': 'user1536.pt',  
+            'file_out': 'user64.pt', 
+            'dimension': 64, 
+            'overwrite': True
+            }
         },
         {
-            # Set the wroper around model, which provide additional methods
-            # Set distilation method, which declared in losses.py
-            'command': 'wrap_model',
-            # Available params: users_emb_file, items_emb_file
-            'params': {
-                'distil_loss': 'NeumfUserRMSE', 
-                'users_emb_file': 'user64.pt',
-                'particular': True 
-                }
+        # Set the wroper around model, which provide additional methods
+        # Set distilation method, which declared in losses.py
+        'command': 'wrap_model',
+        # Available params: users_emb_file, items_emb_file
+        'params': {
+            'distil_loss': 'NeumfUserRMSE', 
+            'users_emb_file': 'user64.pt',
+            'particular': True 
+            }
         },
         {
-            # change the parameters define in config in a run-time
-            'command': 'set_config',
-            'params': {'epochs': 2}
+        # change the parameters define in config in a run-time
+        'command': 'set_config',
+        'params': {'epochs': 2}
         },            
         {
-            # init trainer based on RecBole logic
-            'command': 'init_trainer',
-            'params': None
+        # init trainer based on RecBole logic
+        'command': 'init_trainer',
+        'params': None
         },
         ...
 ```
@@ -198,12 +198,12 @@ For output information about model's strusture there is a `info` command.
 ```
     ...
     {
-        'command': 'info',
-        'params': 1  # will output structure of model,  verbose=1
+    'command': 'info',
+    'params': 1  # will output structure of model,  verbose=1
     },
     {
-        # used for debug purpose
-        'command': 'break'  # interrupt scenario execution
+    # used for debug purpose
+    'command': 'break'  # interrupt scenario execution
     }, 
     ...  
 ```
@@ -241,8 +241,8 @@ In order to to access for all inputs and outputs passing through specific layer 
 ```
     ...
     {
-        'command': 'set_outputs',
-        'params': [9]  # could be an list of layers
+    'command': 'set_outputs',
+    'params': [9]  # could be an list of layers
     },
     ...
 ```
@@ -256,15 +256,33 @@ The data structure, includes input[s] and outout[s] will pass as an input to `di
 ```
     ...
     {
-        'command': 'set_trainable',
-        'params': [[*], False]  # Freeze all layers
+    'command': 'set_trainable',
+    'params': [['*'], False]  # Freeze all layers
     },
     {
-        'command': 'set_trainable',
-        'params': [[4, 5, 6, 7], Train]  # Make tranable specific layers
+    'command': 'set_trainable',
+    'params': [[2, 3, 4, 5], True]  # Make tranable specific layers
     },  
+    {
+    'command': 'info',
+    'params': 0  # will output short infor about number of trainable,  verbose=0
+    },      
     ...  
 ```
+
+In a run-time it will results to the following outputs:
+```
+    ...
+    cmd = 'set_trainable'
+        [2, 3, 4, 5] -> True
+    Set -> True | 2 : Embedding(84, 64)
+    Set -> True | 3 : Embedding(2975, 64)
+    Set -> True | 4 : Embedding(84, 512)
+    Set -> True | 5 : Embedding(2975, 512)
+    cmd = 'info'
+    {'total_params': 2065665, 'train_params': 1761984}
+    ...
+``` 
 
 **Remove distilation loss**
 
@@ -273,8 +291,8 @@ For stop processing outputs from intermediate layers, and eliminate all hook's f
 ```
     ...
     {
-        'command': 'remove_outputs',
-        'params': None            
+    'command': 'remove_outputs',
+    'params': None            
     },
     ...
 ```
