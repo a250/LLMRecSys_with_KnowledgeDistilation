@@ -7,7 +7,7 @@ Structure of folders could particularly tune by config-file, but the typical pro
 ```
 
 .
-├── datasets  # Recommended prepared dataset [1]
+├── datasets  # Recommended prepared datasets ML1M and Amazon [1]
 │   ├── llm_embeddings
 │   │   └── ml-1m # profile embeddings for datasets
 │   └── ml-1m  # secific datasets

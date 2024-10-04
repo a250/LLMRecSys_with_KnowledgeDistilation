@@ -2,25 +2,6 @@
 
 This is a part of ReSys research aimed at calculating user's embeddings based on their interactions with items using LLM capability.
 
-## Installation
-
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/yourusername/LLMUserEncoder.git
-    cd LLMUserEncoder
-    ```
-
-2. Create a virtual environment and activate it:
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-
-3. Install the required dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
-
 ## Usage
 
 ### Preparing the Dataset
