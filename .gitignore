@@ -1,19 +1,19 @@
 # Manually added
 additional/
 # RecBole logs
-log/
-log_tensorboard/
-saved/
-datasets/**
-datasets/Amazon_All_Beauty
-datasets/Steam
+knowledge_transfer_framework/log/
+knowledge_transfer_framework/log_tensorboard/
+knowledge_transfer_framework/saved/
+knowledge_transfer_framework/datasets/**
+knowledge_transfer_framework/datasets/Amazon_All_Beauty
+knowledge_transfer_framework/datasets/Steam
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
+**/.DS_Store
 # C extensions
 *.so
 
@@ -109,7 +109,7 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#   https://python-poetry.org:/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 #poetry.lock
 
 # pdm

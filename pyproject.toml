@@ -21,6 +21,8 @@ umap-learn = "^0.5.6"
 lightgbm = "^4.5.0"
 xgboost = "^2.1.1"
 scipy = "1.12.0"
+backoff = "2.2.1"
+openai = "1.44.1"
 
 
 [build-system]
