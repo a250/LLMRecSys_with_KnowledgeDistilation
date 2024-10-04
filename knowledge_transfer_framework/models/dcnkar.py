@@ -19,6 +19,7 @@ Reference code:
 """
 
 import torch
+import os
 import json
 import torch.nn as nn
 from torch.nn.init import xavier_normal_, constant_
@@ -127,6 +128,12 @@ class DCNKAR(ContextRecommender):
         self.user_profile_file = config["user_profile_json"]
         self.item_profile_file = config["item_profile_json"]
 
+        self.llm_config = config['llm_config']
+        llm_path = self.llm_config['embeddings_path']        
+        dataset_llm_path = os.path.join(llm_path, dataset.dataset_name)
+        user_profile_file = os.path.join(dataset_llm_path, self.user_profile_file)
+        item_profile_file = os.path.join(dataset_llm_path, self.item_profile_file)
+
         self.kar_layer = KARModule(
             user_dim=self.user_kar_emb, 
             item_dim=self.item_kar_emb, 
@@ -135,13 +142,15 @@ class DCNKAR(ContextRecommender):
         )
 
         self.user_profile = load_profile_from_file(
-            f"{config['data_path']}/{self.user_profile_file}",
+            # f"{config['data_path']}/{self.user_profile_file}",
+            user_profile_file,
             dataset,
             entity_id=self.user_id
         )
 
         self.item_profile = load_profile_from_file(
-            f"{config['data_path']}/{self.item_profile_file}",
+            # f"{config['data_path']}/{self.item_profile_file}",
+            item_profile_file,
             dataset,
             entity_id=self.item_id
         )

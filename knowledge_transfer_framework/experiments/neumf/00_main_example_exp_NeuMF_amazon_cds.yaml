@@ -1,6 +1,7 @@
-# Experiment 0. Toy example
+#  Pattern for experimeting with NeuMF
 #   dataset: MoveLeanse, ml-1m
-#
+#   model: NeuMF
+#  distil loss: DistilNFC_CosSim
 
 
 ###
@@ -8,14 +9,16 @@
 ###
 
     logger_level: 'INFO' # 'WARNING'
-    journal_name: 'autoint_distils.csv'    
+    journal_name: 'neumf_distils.csv'    
 
 ###
 # Training settings section
 ###
 
     data_path: './datasets'  # Path to the dataset directory
-    dataset: 'ml-1m_split11'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    dataset: 'amazon_cds'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    #load_col:  {inter: [user_id, product_id]} # for steam dataset need to rename item_id column
+    #ITEM_ID_FIELD: product_id # for steam dataset need to rename item_id column
     seed: 42
     show_progress: False
     save: True
@@ -26,8 +29,8 @@
     eval_batch_size: 64
     train_batch_size: 64
     stopping_step: 50
-    shuffle: True
-    repeatable: True
+    metrics: [ 'Recall', 'MRR', 'NDCG', 'Hit', 'MAP' ]
+    valid_metric: 'MRR@10'    
     benchmark_filename: ['part1', 'part2', 'part3']
 
 
@@ -35,15 +38,15 @@
 # Dataset configuration section
 ###
 
-    USER_ID_FIELD: user_id
-    ITEM_ID_FIELD: item_id
+    # USER_ID_FIELD: user_id
+    # ITEM_ID_FIELD: item_id
     # RATING_FIELD: rating
     # TIME_FIELD: timestamp
 
     load_col:
         inter: [user_id, item_id, rating, timestamp]
 #         user: [user_id, age]
-    user_inter_num_interval: "[150,500)"
+    # user_inter_num_interval: "[450,500)"
 #    item_inter_num_interval: "[101,inf)"
 
     
@@ -60,53 +63,32 @@
     # normalize_all: False
 
 
-
     eval_args:
-        split:
-            RS: [0.7, 0.15, 0.15]
-        order: 'RO'
         mode:
-            'valid': 'pop50'
-            'test': 'pop50'
+            'valid': 'pop20'
+            'test': 'uni100'
 
-
-#    add_train_shuffle: False
-#    add_train_split: [0.5, 0.5]
+    # add_train_shuffle: False
+    # add_train_split: [0.5, 0.5]
 
 ###
 # Model setup section
 ###
 
-    model: 'DCNKAR'  # Model to use;
+    model: 'NeuMF'  # Model to use; Examples: NeuMF, DSSM
+    mf_embedding_size: 64 # default 64
+    mlp_embedding_size: 512
+    mlp_hidden_size: [256, 128, 64]
+    dropout_prob: 0.1
 
-    # embedding_size: 96
-    # attention_size: 16    #   default = 16
-    # n_layers: 3 # default = 3  #  NonDynamicallyQuantizableLinear(in_features=16, out_features=16, bias=True)
-    # num_heads: 2 # default = 2  # embed_dim must be divisible by num_heads
-    # dropout_probs: [0.2, 0.2, 0.2] # default = [0.2, 0.2, 0.2]
-    # mlp_hidden_size: [128, 128] # default = [128, 128]
-
-    embedding_size: 96 #The embedding size of features. Defaults to 10.
-    mlp_hidden_size: [256, 256, 256] # (list of int) : The hidden size of MLP layers. Defaults to [256,256,256].
-    cross_layer_num: 6  # (int) : The number of cross layers. Defaults to 6.
-    reg_weight: 2 # (float) : The L2 regularization weight. Defaults to 2.
-    dropout_prob: 0.2 # (float) : The dropout rate. Defaults to 0.2.
-
-    # KAR Section
-    user_kar_emb: 196
-    item_kar_emb: 196
-    item_kar_experts_n: 3
-    output_kar_dim: 96
-    user_profile_json: 'kar_users_profile_exp_XX.json'  # data_path / dataset / user_profile_json
-    item_profile_json: 'kar_items_profile_exp_XX.json'
-
+    
     llm_config:
         embeddings_path: './datasets/llm_embeddings'   
         default_users_emb_file: 'user.pt'
         default_items_emb_file: 'item.pt'
         
         preprocess_from_json:    
-            from: 'full_user_description.json'
+            from: 'user_embs.json'
             to: 'user1536.pt'
             by: 'exp_2024_04_11'
 
@@ -123,7 +105,7 @@
         items_start_with_1: True # Add zero string at 0 position of embeddings matrix
 
         
-    distil_loss_weight: 0.1  # [0, 1]
+    distil_loss_weight: 0.5  # [0, 1]
     
 ###
 # Scenario Training setup
@@ -148,8 +130,8 @@
             'command': 'reduce_dim',
             'params': {
                 'file_in': 'user1536.pt',  
-                'file_out': 'user32.pt', 
-                'dimension': 32, 
+                'file_out': 'user64.pt', 
+                'dimension': 64, 
                 'overwrite': True
                 }
             },
@@ -157,8 +139,8 @@
             'command': 'wrap_model',
             # Available params: users_emb_file, items_emb_file
             'params': {
-                'distil_loss': 'AutoIntUserRMSE', 
-                'users_emb_file': 'user32.pt',
+                'distil_loss': 'NeumfUserRMSE', 
+                'users_emb_file': 'user64.pt',
                 'particular': True 
                 }
             },
@@ -173,26 +155,29 @@
             {
             'command': 'info',
             'params': 0
-            },
-#             {
-#             'command': 'set_trainable',
-#             'params': [['*'], True]  # list of layers should be changed on True/False
-#             },
-            {
-            'command': 'info',
-            'params': 0
-            },
-#             {
-#             'command': 'set_outputs',
-#             'params': [23]
-#             },
+            },            
+            # {
+            # 'command': 'set_trainable',
+            # 'params': [[0, 1, 2, 3], False]  # list of layers should be changed on True/False
+            # },
+            # {
+            # 'command': 'info',
+            # 'params': 0
+            # },
+            # {
+            # 'command': 'break'
+            # },               
+            # {
+            # 'command': 'set_outputs',
+            # 'params': [15]
+            # },
             {
             'command': 'set_train_dataset',
             'params': 0 # 0 or 1, as far as there is only two options
             },
-#             {
-#             'command': 'break'
-#             },            
+            # {
+            # 'command': 'break'
+            # },            
             {
             'command': 'train',
             'params': None

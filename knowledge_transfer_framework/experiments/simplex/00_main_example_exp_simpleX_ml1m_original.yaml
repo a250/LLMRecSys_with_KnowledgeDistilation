@@ -1,7 +1,6 @@
 # Experiment XX
 #   dataset: MoveLeanse, ml-1m
-#
-#   model: MultiVAE
+#   model: SimpleX
 #  distil loss: 
 
 
@@ -10,14 +9,14 @@
 ###
 
     logger_level: 'INFO' # 'WARNING'
-    journal_name: 'ngcf_distils.csv'    
+    journal_name: 'simplex_distils.csv'    
 
 ###
 # Training settings section
 ###
 
     data_path: './datasets'  # Path to the dataset directory
-    dataset: 'ml-1m'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    dataset: 'ml-1m_original'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
     #load_col:  {inter: [user_id, product_id]} # for steam dataset need to rename item_id column
     #ITEM_ID_FIELD: product_id # for steam dataset need to rename item_id column
     seed: 42
@@ -27,24 +26,26 @@
     epochs: 3  # Number of epochs to train
     learning_rate: 0.01  # Learning rate
     use_gpu: False  # Use GPU for training
-    eval_batch_size: 71
-    train_batch_size: 72
+    eval_batch_size: 64
+    train_batch_size: 64
     stopping_step: 50
+    metrics: [ 'Recall', 'MRR', 'NDCG', 'Hit', 'MAP' ]
+    valid_metric: 'MRR@10'    
+    benchmark_filename: ['part1', 'part2', 'part3']
 
 ###
 # Dataset configuration section
 ###
 
-#     USER_ID_FIELD: user_id
-#     ITEM_ID_FIELD: item_id
+    # USER_ID_FIELD: user_id
+    # ITEM_ID_FIELD: item_id
     # RATING_FIELD: rating
     # TIME_FIELD: timestamp
 
     load_col:
         inter: [user_id, item_id, rating, timestamp]
 #         user: [user_id, age]
-#    user_inter_num_interval: "[450,500)"
-    user_inter_num_interval: "[20,30]"
+    user_inter_num_interval: "[450,500)"
 #    item_inter_num_interval: "[101,inf)"
 
     
@@ -63,38 +64,39 @@
 
 
     eval_args:
-        split:
-            RS: [0.7, 0.15, 0.15]
-        order: 'RO'
         mode:
-            'valid': 'pop50'
-            'test': 'pop50'
+            'valid': 'pop20'
+            'test': 'uni100'
 
 
-    add_train_shuffle: False
-    #    add_train_split: [0.5, 0.5]
+    # add_train_shuffle: False
+    # add_train_split: [0.5, 0.5]
 
 ###
 # Model setup section
 ###
 
-    model: 'NGCF'  # Model to use;
-
-    embedding_size: 64  #  The embedding size of users and items. Defaults to 64.
-    hidden_size_list: [64, 64, 64] #  The hidden size of each layer in GCN layers, 
-                              #  the length of list is equal to the number of layers. 
-                              #   Defaults to [64,64,64].
-    node_dropout: 0.0 #  The dropout rate of node in each GNN layer. Defaults to 0.0.
-    message_dropout: 0.1 # The dropout rate of edge in each GNN layer. Defaults to 0.1.
-    reg_weight: 1e-5 # The L2 regularization weight. Defaults to 1e-5.    
-
+    model: 'SimpleX'      # Model to use; Examples: NeuMF, DSSM
+    embedding_size: 128   #   The embedding size of users and items. Defaults to 64.
+    margin: 0.9           #   The margin to filter negative samples in CCL loss. 
+                          #   Range in [-1, 1]. Defaults to 0.9.
+    negative_weight: 10   #   Control the relative weights of positive-sample loss 
+                          #      and negative-sample loss in CCL loss. Defaults to 10.
+    gamma: 0.5            #   The weight for fusion of user representations and 
+                          #      historically interacted items representations. 
+                          #   Range in [0, 1]. Defaults to 0.5.
+    aggregator: 'mean'    #   The way to aggregate historically interacted items representations.
+                          #   Range in ['mean', 'user_attention', 'self_attention']. Defaults to 'mean'.
+    history_len: 50       #   The length of the user’s historical interaction items. Defaults to 50.
+    reg_weight: 1e-5      #   The L2 regularization weight. Defaults to 1e-05.
+    
     llm_config:
         embeddings_path: './datasets/llm_embeddings'   
         default_users_emb_file: 'user.pt'
         default_items_emb_file: 'item.pt'
         
         preprocess_from_json:    
-            from: 'full_user_description.json'
+            from: 'user_embs.json'
             to: 'user1536.pt'
             by: 'exp_2024_04_11'
 
@@ -111,7 +113,7 @@
         items_start_with_1: True # Add zero string at 0 position of embeddings matrix
 
         
-    distil_loss_weight: 0.1  # [0, 1]
+    distil_loss_weight: 0.5  # [0, 1]
     
 ###
 # Scenario Training setup
@@ -145,7 +147,7 @@
             'command': 'wrap_model',
             # Available params: users_emb_file, items_emb_file
             'params': {
-                'distil_loss': 'NGCFUserRMSE', 
+                'distil_loss': 'SimpleXUserRMSE', 
                 'users_emb_file': 'user64.pt',
                 'particular': True 
                 }
@@ -168,11 +170,11 @@
             # },
             {
             'command': 'info',
-            'params': 1
+            'params': 0
             },
             {
             'command': 'set_outputs',
-            'params': [9]
+            'params': [5]
             },
             {
             'command': 'set_train_dataset',
