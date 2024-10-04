@@ -7,7 +7,7 @@ Structure of folders could particularly tune by config-file, but the typical pro
 ```
 
 .
-├── datasets  # Recommended prepared [dataset](https://drive.google.com/file/d/1ETEM4z7SFGUDwukHiLXEdNvCHe-2H-U9/view?usp=drive_link)
+├── datasets  # Recommended prepared dataset [1]
 │   ├── llm_embeddings
 │   │   └── ml-1m # profile embeddings for datasets
 │   └── ml-1m  # secific datasets
@@ -53,6 +53,7 @@ Structure of folders could particularly tune by config-file, but the typical pro
 ├── pyproject.toml   # required dependencies
 └── run_exps.py      # main enter poit for running
 ```
+[1] [Prepared dataset]((https://drive.google.com/file/d/1ETEM4z7SFGUDwukHiLXEdNvCHe-2H-U9/view?usp=drive_link))
 
 The way of running specific experiment or the bunch of experiments which collected in folder:
 ```
