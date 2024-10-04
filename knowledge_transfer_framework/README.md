@@ -53,7 +53,7 @@ Structure of folders could particularly tune by config-file, but the typical pro
 ├── pyproject.toml   # required dependencies
 └── run_exps.py      # main enter poit for running
 ```
-[1] [Prepared dataset]((https://drive.google.com/file/d/1ETEM4z7SFGUDwukHiLXEdNvCHe-2H-U9/view?usp=drive_link))
+[1] [Prepared dataset](https://drive.google.com/file/d/1ETEM4z7SFGUDwukHiLXEdNvCHe-2H-U9/view?usp=drive_link)
 
 The way of running specific experiment or the bunch of experiments which collected in folder:
 ```
