@@ -9,19 +9,22 @@
 #   paper: https://arxiv.org/abs/1810.11921 
 
 
+#  distil loss: DistilNFC_CosSim
+
+
 ###
 # General section
 ###
 
     logger_level: 'INFO' # 'WARNING'
-    journal_name: 'autointkar_distils.csv'    
+    journal_name: 'autoint_distils.csv'    
 
 ###
 # Training settings section
 ###
 
     data_path: './datasets'  # Path to the dataset directory
-    dataset: 'ml-1m_original'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    dataset: 'ml-1m_split11'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
     seed: 42
     show_progress: False
     save: True
@@ -34,9 +37,7 @@
     stopping_step: 50
     shuffle: True
     repeatable: True
-    metrics: [ 'Recall', 'MRR', 'NDCG', 'Hit', 'MAP' ]
-    valid_metric: 'MRR@10'     
-    benchmark_filename: ['part1', 'part2', 'part3']    
+    benchmark_filename: ['part1', 'part2', 'part3']
 
 
 ###
@@ -50,7 +51,7 @@
 
     load_col:
         inter: [user_id, item_id, rating, timestamp]
-        user: [user_id, age]
+#         user: [user_id, age]
     # user_inter_num_interval: "[450,500)"
 #    item_inter_num_interval: "[101,inf)"
 
@@ -68,10 +69,14 @@
     # normalize_all: False
 
 
+
     eval_args:
+        split:
+            RS: [0.7, 0.15, 0.15]
+        order: 'RO'
         mode:
-            'valid': 'pop20'
-            'test': 'uni100'
+            'valid': 'pop50'
+            'test': 'pop50'
 
 
 #    add_train_shuffle: False
@@ -81,24 +86,26 @@
 # Model setup section
 ###
 
-    model: 'AutoIntKAR'  # Model to use;
+    model: 'DeepFMKAR'  # Model to use;
 
-    embedding_size: 32 #96
-    attention_size: 16    #   default = 16
-    n_layers: 3 # default = 3  #  NonDynamicallyQuantizableLinear(in_features=16, out_features=16, bias=True)
-    num_heads: 2 # default = 2  # embed_dim must be divisible by num_heads
-    dropout_probs: [0.2, 0.2, 0.2] # default = [0.2, 0.2, 0.2]
-    mlp_hidden_size: [128, 128] # default = [128, 128]
+    # embedding_size: 96
+    # attention_size: 16    #   default = 16
+    # n_layers: 3 # default = 3  #  NonDynamicallyQuantizableLinear(in_features=16, out_features=16, bias=True)
+    # num_heads: 2 # default = 2  # embed_dim must be divisible by num_heads
+    # dropout_probs: [0.2, 0.2, 0.2] # default = [0.2, 0.2, 0.2]
+    # mlp_hidden_size: [128, 128] # default = [128, 128]
+
+    embedding_size: 96 # (int) : The embedding size of features. Defaults to 10.
+    mlp_hidden_size: [128,128,128] # (list of int) : The hidden size of MLP layers. Defaults to [128,128,128].
+    dropout_prob: 0.2 # (float) : The dropout rate. Defaults to 0.2.
 
     # KAR Section
-    user_kar_emb: 1536 #196
-    item_kar_emb: 1536 # 196
+    user_kar_emb: 196
+    item_kar_emb: 196
     item_kar_experts_n: 3
-    output_kar_dim: 32 # 96
-    # user_profile_json: 'kar_users_profile_exp_XX.json'  
-    # item_profile_json: 'kar_items_profile_exp_XX.json'
-    user_profile_json: 'user_embs.json'  
-    item_profile_json: 'item_embs.json'
+    output_kar_dim: 96
+    user_profile_json: 'kar_users_profile_exp_XX.json'  # data_path / dataset / user_profile_json
+    item_profile_json: 'kar_items_profile_exp_XX.json'
 
     llm_config:
         embeddings_path: './datasets/llm_embeddings'   
@@ -106,7 +113,7 @@
         default_items_emb_file: 'item.pt'
         
         preprocess_from_json:    
-            from: 'user_embs.json'
+            from: 'full_user_description.json'
             to: 'user1536.pt'
             by: 'exp_2024_04_11'
 
@@ -123,7 +130,7 @@
         items_start_with_1: True # Add zero string at 0 position of embeddings matrix
 
         
-    distil_loss_weight: 0.5  # [0, 1]
+    distil_loss_weight: 0.1  # [0, 1]
     
 ###
 # Scenario Training setup
@@ -182,17 +189,17 @@
             'command': 'info',
             'params': 0
             },
-            {
-            'command': 'set_outputs',
-            'params': [3]
-            },
+#             {
+#             'command': 'set_outputs',
+#             'params': [23]
+#             },
             {
             'command': 'set_train_dataset',
             'params': 0 # 0 or 1, as far as there is only two options
             },
-            # {
-            # 'command': 'break'
-            # },            
+#             {
+#             'command': 'break'
+#             },            
             {
             'command': 'train',
             'params': None

@@ -9,9 +9,6 @@
 #   paper: https://arxiv.org/abs/1810.11921 
 
 
-#  distil loss: DistilNFC_CosSim
-
-
 ###
 # General section
 ###

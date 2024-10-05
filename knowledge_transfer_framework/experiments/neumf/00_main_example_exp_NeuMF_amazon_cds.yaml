@@ -1,7 +1,6 @@
 #  Pattern for experimeting with NeuMF
-#   dataset: MoveLeanse, ml-1m
+
 #   model: NeuMF
-#  distil loss: DistilNFC_CosSim
 
 
 ###

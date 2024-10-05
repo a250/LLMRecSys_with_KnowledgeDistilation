@@ -45,7 +45,7 @@
     load_col:
         inter: [user_id, item_id, rating, timestamp]
 #         user: [user_id, age]
-    user_inter_num_interval: "[450,500)"
+    # user_inter_num_interval: "[450,500)"
 #    item_inter_num_interval: "[101,inf)"
 
     

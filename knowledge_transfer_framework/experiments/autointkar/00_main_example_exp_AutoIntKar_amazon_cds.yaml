@@ -8,7 +8,6 @@
 #   paper: https://dl.acm.org/doi/10.1145/3357384.3357925
 #   paper: https://arxiv.org/abs/1810.11921 
 
-
 ###
 # General section
 ###
@@ -21,7 +20,7 @@
 ###
 
     data_path: './datasets'  # Path to the dataset directory
-    dataset: 'ml-1m_original'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    dataset: 'amazon_cds'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
     seed: 42
     show_progress: False
     save: True
@@ -83,7 +82,7 @@
 
     model: 'AutoIntKAR'  # Model to use;
 
-    embedding_size: 32 #96
+    embedding_size: 32
     attention_size: 16    #   default = 16
     n_layers: 3 # default = 3  #  NonDynamicallyQuantizableLinear(in_features=16, out_features=16, bias=True)
     num_heads: 2 # default = 2  # embed_dim must be divisible by num_heads
@@ -91,12 +90,10 @@
     mlp_hidden_size: [128, 128] # default = [128, 128]
 
     # KAR Section
-    user_kar_emb: 1536 #196
-    item_kar_emb: 1536 # 196
+    user_kar_emb: 1536
+    item_kar_emb: 1536
     item_kar_experts_n: 3
-    output_kar_dim: 32 # 96
-    # user_profile_json: 'kar_users_profile_exp_XX.json'  
-    # item_profile_json: 'kar_items_profile_exp_XX.json'
+    output_kar_dim: 32
     user_profile_json: 'user_embs.json'  
     item_profile_json: 'item_embs.json'
 

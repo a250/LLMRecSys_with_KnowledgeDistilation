@@ -1,8 +1,3 @@
-# Experiment 0. Toy example
-#   dataset: MoveLeanse, ml-1m
-#
-
-
 ###
 # General section
 ###
@@ -76,19 +71,19 @@
 
     model: 'DCNKAR'  # Model to use;
 
-    embedding_size: 96 #The embedding size of features. Defaults to 10.
+    embedding_size: 32 #The embedding size of features. Defaults to 10.
     mlp_hidden_size: [256, 256, 256] # (list of int) : The hidden size of MLP layers. Defaults to [256,256,256].
     cross_layer_num: 6  # (int) : The number of cross layers. Defaults to 6.
     reg_weight: 2 # (float) : The L2 regularization weight. Defaults to 2.
     dropout_prob: 0.2 # (float) : The dropout rate. Defaults to 0.2.
 
     # KAR Section
-    user_kar_emb: 196
-    item_kar_emb: 196
+    user_kar_emb: 1536
+    item_kar_emb: 1536
     item_kar_experts_n: 3
-    output_kar_dim: 96
-    user_profile_json: 'kar_users_profile_exp_XX.json'  
-    item_profile_json: 'kar_items_profile_exp_XX.json'
+    output_kar_dim: 32
+    user_profile_json: 'user_embs.json'  
+    item_profile_json: 'item_embs.json'
 
     llm_config:
         embeddings_path: './datasets/llm_embeddings'   
@@ -113,7 +108,7 @@
         items_start_with_1: True # Add zero string at 0 position of embeddings matrix
 
         
-    distil_loss_weight: 0.1  # [0, 1]
+    distil_loss_weight: 0.5  # [0, 1]
     
 ###
 # Scenario Training setup

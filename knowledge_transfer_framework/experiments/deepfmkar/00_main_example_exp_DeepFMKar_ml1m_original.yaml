@@ -1,20 +1,9 @@
-# Experiment 0. Toy example
-#   dataset: MoveLeanse, ml-1m
-#
-#   model: AutoInt
-#   https://recbole.io/docs/user_guide/model/context/autoint.html
-#   https://github.com/RUCAIBox/RecBole/blob/v1.1.1/recbole/model/context_aware_recommender/autoint.py
-#
-#   paper: https://dl.acm.org/doi/10.1145/3357384.3357925
-#   paper: https://arxiv.org/abs/1810.11921 
-
-
 ###
 # General section
 ###
 
     logger_level: 'INFO' # 'WARNING'
-    journal_name: 'autointkar_distils.csv'    
+    journal_name: 'deepfmkar_distils.csv'    
 
 ###
 # Training settings section
@@ -36,7 +25,7 @@
     repeatable: True
     metrics: [ 'Recall', 'MRR', 'NDCG', 'Hit', 'MAP' ]
     valid_metric: 'MRR@10'     
-    benchmark_filename: ['part1', 'part2', 'part3']    
+    benchmark_filename: ['part1', 'part2', 'part3']
 
 
 ###
@@ -50,7 +39,7 @@
 
     load_col:
         inter: [user_id, item_id, rating, timestamp]
-        user: [user_id, age]
+#         user: [user_id, age]
     # user_inter_num_interval: "[450,500)"
 #    item_inter_num_interval: "[101,inf)"
 
@@ -74,6 +63,7 @@
             'test': 'uni100'
 
 
+
 #    add_train_shuffle: False
 #    add_train_split: [0.5, 0.5]
 
@@ -81,22 +71,17 @@
 # Model setup section
 ###
 
-    model: 'AutoIntKAR'  # Model to use;
+    model: 'DeepFMKAR'  # Model to use;
 
-    embedding_size: 32 #96
-    attention_size: 16    #   default = 16
-    n_layers: 3 # default = 3  #  NonDynamicallyQuantizableLinear(in_features=16, out_features=16, bias=True)
-    num_heads: 2 # default = 2  # embed_dim must be divisible by num_heads
-    dropout_probs: [0.2, 0.2, 0.2] # default = [0.2, 0.2, 0.2]
-    mlp_hidden_size: [128, 128] # default = [128, 128]
+    embedding_size: 32 # (int) : The embedding size of features. Defaults to 10.
+    mlp_hidden_size: [128,128,128] # (list of int) : The hidden size of MLP layers. Defaults to [128,128,128].
+    dropout_prob: 0.2 # (float) : The dropout rate. Defaults to 0.2.
 
     # KAR Section
-    user_kar_emb: 1536 #196
-    item_kar_emb: 1536 # 196
+    user_kar_emb: 1536
+    item_kar_emb: 1536
     item_kar_experts_n: 3
-    output_kar_dim: 32 # 96
-    # user_profile_json: 'kar_users_profile_exp_XX.json'  
-    # item_profile_json: 'kar_items_profile_exp_XX.json'
+    output_kar_dim: 32
     user_profile_json: 'user_embs.json'  
     item_profile_json: 'item_embs.json'
 
@@ -182,17 +167,17 @@
             'command': 'info',
             'params': 0
             },
-            {
-            'command': 'set_outputs',
-            'params': [3]
-            },
+#             {
+#             'command': 'set_outputs',
+#             'params': [23]
+#             },
             {
             'command': 'set_train_dataset',
             'params': 0 # 0 or 1, as far as there is only two options
             },
-            # {
-            # 'command': 'break'
-            # },            
+#             {
+#             'command': 'break'
+#             },            
             {
             'command': 'train',
             'params': None
