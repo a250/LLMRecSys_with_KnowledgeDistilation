@@ -1,0 +1,7 @@
+0. Just exp with whole train dataset 
+1. Train             on 0.5 train-dataset, fine-tune on other 0.5 train-dataset (with weights freezing)
+2. Train with distil on 0.5 train-dataset, fine-tune on other 0.5 train-dataset (with weights freezing)
+3. Train with distil on 0.5 train-dataset, fine-tune on     whole train-dataset (with weights freezing)
+ 
+х2, as far as for ranking and value-metric
+х2, as far as for two different seed's for train splitting

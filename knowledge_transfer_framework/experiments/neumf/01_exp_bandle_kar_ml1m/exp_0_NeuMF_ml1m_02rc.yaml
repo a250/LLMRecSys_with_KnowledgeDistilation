@@ -1,0 +1,240 @@
+# Experiment 0. Toy example
+#   dataset: MoveLeanse, ml-1m
+#   model: NeuMF
+#  distil loss: DistilNFC_CosSim
+
+
+###
+# General section
+###
+
+    logger_level: 'INFO' # 'WARNING'
+    journal_name: 'neumf_distils_1.csv'    
+
+
+###
+# Training settings section
+###
+
+    data_path: './datasets'  # Path to the dataset directory
+    dataset: 'ml-1m'  # ml-100k, Amazon_All_Beauty, steam. Download dataset from: https://github.com/RUCAIBox/RecSysDatasets
+    #load_col:  {inter: [user_id, product_id]} # for steam dataset need to rename item_id column
+    #ITEM_ID_FIELD: product_id # for steam dataset need to rename item_id column
+    seed: 42
+    show_progress: False
+    save: True
+    reproducibility: True
+    epochs: 3  # Number of epochs to train
+    learning_rate: 0.01  # Learning rate
+    use_gpu: False  # Use GPU for training
+    eval_batch_size: 64
+    train_batch_size: 64
+    stopping_step: 50
+    metrics: ['Recall', 'MRR', 'MAP', 'NDCG', 'Hit', 'Precision']
+    topk: [10, 6, 3]    
+
+
+###
+# Dataset configuration section
+###
+
+    # USER_ID_FIELD: user_id
+    # ITEM_ID_FIELD: item_id
+    # RATING_FIELD: rating
+    # TIME_FIELD: timestamp
+
+    load_col:
+        inter: [user_id, item_id, rating, timestamp]
+#         user: [user_id, age]
+    user_inter_num_interval: "[20,150)"
+#    item_inter_num_interval: "[101,inf)"
+
+    
+    # min_user_inter_num: 5
+    # max_user_inter_num: 500
+    # val_interval:
+    #    rating: "[3,inf)"
+    #    rating: "[1,3)"
+    #    timestamp: "[97830000, inf)"
+
+    threshold:
+        rating: 3
+    # train_neg_sample_args: ~
+    # normalize_all: False
+
+
+
+    eval_args:
+        split:
+            RS: [0.7, 0.15, 0.15]
+        order: 'RO'
+        mode:
+            'valid': 'pop50'
+            'test': 'pop50'
+
+
+    add_train_shuffle: False
+    add_train_split: [0.5, 0.5]
+
+###
+# Model setup section
+###
+
+    model: 'NeuMF'  # Model to use; Examples: NeuMF, DSSM
+    mf_embedding_size: 64 # default 64
+    mlp_embedding_size: 512
+    mlp_hidden_size: [256, 128, 64]
+    dropout_prob: 0.1
+
+    
+    llm_config:
+        embeddings_path: './datasets/llm_embeddings'   
+        default_users_emb_file: 'user.pt'
+        default_items_emb_file: 'item.pt'
+        
+        preprocess_from_json:    
+            from: 'full_user_description.json'
+            to: 'user1536.pt'
+            by: 'exp_2024_04_11'
+
+        preprocess_random:        
+            random: False  # in case if we want generate random embeddings
+            embedding_size: 100 # size of embeddings for random embeddings
+            random_users_emb_file: 'user.pt'
+            random_items_emb_file: 'item.pt'
+          
+        use_user_emb: True # Do we need loading users emb 
+        use_item_emb: False # Do we need loading items emb
+        
+        users_start_with_1: True  # Add zero string at 0 position of embeddings matrix
+        items_start_with_1: True # Add zero string at 0 position of embeddings matrix
+
+        
+    distil_loss_weight: 0.3  # [0, 1]
+    
+###
+# Scenario Training setup
+###
+
+    scenario:
+        [
+        # Part 1 Destilation
+            {
+            'command': 'print',
+            'params': '-----Part #1: distilation'
+            },
+            {
+            'command': 'set',
+            'params': {'train_part': 0}
+            },
+            {
+            'command': 'init_model',
+            'params': None
+            },
+            {
+            'command': 'reduce_dim',
+            'params': {
+                'file_in': 'user1536.pt',  
+                'file_out': 'user64.pt', 
+                'dimension': 64, 
+                'overwrite': True
+                }
+            },
+            {
+            'command': 'wrap_model',
+            # Available params: users_emb_file, items_emb_file
+            'params': {
+                'distil_loss': 'NeumfUserRMSE', 
+                'users_emb_file': 'user64.pt',
+                'particular': True 
+                }
+            },
+            {
+            'command': 'set_config',
+            'params': {'epochs': 20}
+            },            
+            {
+            'command': 'init_trainer',
+            'params': None
+            },
+            {
+            'command': 'info',
+            'params': 0
+            },
+            # {
+            # 'command': 'set_trainable',
+            # 'params': [[0, 1, 2, 3], False]  # list of layers should be changed on True/False
+            # },
+            {
+            'command': 'info',
+            'params': 1
+            },
+            {
+            'command': 'set_outputs',
+            'params': [15]
+            },
+            {
+            'command': 'set_train_dataset',
+            'params': 0 # 0 or 1, as far as there is only two options
+            },
+            # {
+            # 'command': 'break'
+            # },            
+            {
+            'command': 'train',
+            'params': None
+            },
+            {
+            'command': 'test_eval',
+            'params': None
+            },
+         # Part 2 Learning
+            {
+            'command': 'print',
+            'params': '-----Part #2: fine-tune without distilation'
+            },
+            {
+            'command': 'set',
+            'params': {'train_part': 1}
+            },         
+            {
+            'command': 'remove_outputs',
+            'params': None
+            },
+            {
+            'command': 'set_config',
+            'params': {'epochs': 20}
+            },    
+            {
+            'command': 'init_trainer',
+            'params': None
+            },
+            {
+            'command': 'info',
+            'params': 0
+            },
+            {
+            'command': 'set_trainable',
+            'params': [['*'], False]  # list of layers should be changed on True/False
+            },
+            {
+            'command': 'set_trainable',
+            'params': [[2, 3, 4, 5, 16, 17, 18, 19], True]  # list of layers should be changed on True/False
+            },    
+            {
+            'command': 'info',
+            'params': 0
+            },                        
+            {
+            'command': 'set_train_dataset',
+            'params': 2 # 0 or 1, as far as there is only two options
+            },
+            {
+            'command': 'train',
+            'params': None
+            },
+            {
+            'command': 'test_eval',
+            'params': None
+            }            
+        ]
