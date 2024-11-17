@@ -1,6 +1,5 @@
-# LLMUserEncoder
-
-This is a part of ReSys research aimed at calculating user's embeddings based on their interactions with items using LLM capability.
+# LLM-KT
+A Versatile Framework for Knowledge Transfer from Large Language Models to Collaborative Filtering.
 
 ## Installation
 
